@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Hättan Palace{% endblock %}</title>
+    <link rel="stylesheet" href="/static/main.css">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
+</head>
+<body>
+    <nav>
+        <div class="upper-nav">
+            <div class="upp-icon-nav">
+            
+                <span class="material-symbols-outlined icon">location_on</span>
+                Centrum, Trollhättan
+                
+            </div>
+            <div class="upp-icon-nav">
+                <span class="material-symbols-outlined icon">mail</span>
+                HättanPservice@gmail.com
+            </div> 
+        </div>
+        <div class="lower-nav">
+            <div>
+                <img src="/static/img/navigaton/hotel-logo.png" alt="Hättan Palace Logo"> 
+                <span class="nav-line"></span>
+            </div>
+            <ul>
+                <li><a href="/">Home</a></li>
+                <li><a href="/Rooms">Rooms</a></li>
+                {% if user %}
+                    <li><a href="/bookings">Bookings</a></li>
+                {% endif %}
+                <li><a href="/Login">Login</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    {% block content %}{% endblock %}
+
+    <footer>
+       <p>© Hättan Palace 2026</p>
+    </footer>
+    
+    <script src="/static/main.js"></script>
+</body>
+</html>
