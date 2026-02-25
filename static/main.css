@@ -244,7 +244,7 @@ footer {
   position: relative;
   z-index: 2;
   height: 90%;
-  width: 50%;
+  text-align: center;
   text-align: center;
   display: flex;
   flex-direction: column;
@@ -458,3 +458,32 @@ footer {
   top: 30px;
   left: 30px;
 }
+
+
+
+
+
+
+/* SIZE MODIFICATION */
+
+/* Large laptops / desktops */
+@media (max-width: 1200px) { 
+
+}
+
+/* Tablets */
+@media (max-width: 992px) { 
+
+  .hero-cont h2 {
+    font-size: 4rem;
+  }
+
+}
+
+/* Small tablets / large phones */
+@media (max-width: 768px) { 
+  
+}
+
+/* Phones */
+@media (max-width: 576px) { }
