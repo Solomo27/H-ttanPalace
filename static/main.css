@@ -6,6 +6,7 @@
   line-height: 1;
 }
 
+
 /*Base.htlm Css*/
 
 
@@ -30,13 +31,48 @@ nav {
   color: #D8CFC4;
   justify-content: left;
   display: flex;
+  justify-content: space-between;
   font-weight: bold;
   padding: 0 2rem;
   font-size: 0.9rem;
   gap: 2.5rem;
   align-items: center;
+  z-index: 2;
 }
 
+.left-upper-nav {
+  display: flex;
+  gap: 2.5rem;
+  align-items: center;
+}
+
+.upper-nav i{
+  font-size: 18px;
+  color: #BFA46F;
+}
+
+.right-upper-nav {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.tele {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.right-upper-nav button{
+  border: none;
+  padding: 0.5rem;
+  font-size: 1rem;
+  color: white;
+  background-color: #BFA46F;
+  cursor: pointer;
+  font-family: "Montserrat", sans-serif;
+}
 
 .upp-icon-nav {
   height: 100%;
@@ -51,6 +87,23 @@ nav {
   vertical-align: middle;
   color: #BFA46F; 
 }
+
+.pa-phone {
+  position: relative;
+}
+
+.pa-phone::before {
+  content: "";
+  position: absolute;
+  left: -15px;
+  top: 50%;
+  transform: translateY(-50%);
+  height: 60%;  /* looks cleaner than 100% */
+  width: 2px;
+  background-color: #BFA46F;
+}
+
+
 
 .lower-nav {
   top: 0;
@@ -72,35 +125,79 @@ nav {
 }
 
 nav ul {
-    list-style: none;
-    display: flex;
-    padding: 0.5rem;
-    gap: 0.5rem;
+  list-style: none;
+  display: flex;
+  padding: 0.5rem;
+  gap: 1rem;
 }
 
 nav ul a {
-    text-decoration: none;
-    color: black;
-    font-weight: bold;
-    font-size: 1.2rem;
+  position: relative;
+  text-decoration: none;
+  color: black;
+  font-weight: bold;
+  font-size: 1.2rem;
+  font-family: "Montserrat", sans-serif;
+  font-weight: 600;
 }
 
-.nav-line {
-  width: 1px;
-  height: 100%;
+.lower-nav ul a::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -4px;
+  width: 0;
+  height: 3px;
+  background-color: #BFA46F; /* stronger gold */
+  transition: width 0.3s ease;
+  z-index: 2;
+}
+
+.lower-nav ul a:hover::after{
+  width: 100%;
+}
+
+.nav-links {
+  display: flex;
+  gap: 1.5rem;
+  justify-content: center;
+  align-items: center;
+}
+
+.nav-links span {
+  position: relative;
+  font-size:2.2rem;
+  color: #BFA46F;
+  cursor: pointer;
+  transition: font-size ease 0.3s
+}
+
+.nav-links span:hover{
+  font-size: 2.3rem;
+}
+
+.nav-links span::before{
+  content: "";
+  position: absolute;
+  left: -15px;
+  top: 50%;
+  transform: translateY(-50%);
+  height: 100%;  /* looks cleaner than 100% */
+  width: 2px;
   background-color: #BFA46F;
-  z-index: 2  ;
 }
-
 
 /*FOOTER CSS FOR BASE.HTML */
 
 footer {
+  position: relative;
   height: 5vh;
   background-color: black;
   width: 100%;
-  position: relative;
-  bottom: 0;
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 
@@ -113,17 +210,22 @@ footer {
 .hero {
   position: relative;
   background-image: url("/static/img/landing/Nbed-hero.jpg");
-  height: 90vh;
+  height: 80vh;
   background-size: cover;
   background-position: center 25%;
   color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 0 0 10px 10px;
 }
 
 .overlay {
   position: absolute;
   top: 15vh;
   inset: 0;
-  background: rgba(0, 0, 0, 0.45); /* adjust darkness here */
+  background: rgba(0, 0, 0, 0.6); /* adjust darkness here */
+  border-radius: 0 0 10px 10px;
 }
 
 /* .hero {
@@ -142,30 +244,217 @@ footer {
   position: relative;
   z-index: 2;
   height: 90%;
-  width: 100%;
+  width: 50%;
   text-align: center;
   display: flex;
   flex-direction: column;
-  gap: 0.8rem;
+  gap: 1.5rem;
   justify-content: center;
   align-items: center;
   font-weight: bold;
   font-size: 1.5rem;
 }
 
+.hero-cont h2 {
+  font-family: "Playfair Display", serif;
+  font-size: 5rem;
+  font-weight: 900;
+}
+
+.text {
+  font-family: "Playfair Display", serif;
+  font-size: 1.1rem;
+  font-weight: 500;
+  line-height: 1;
+}
+
+.hero-btn-cont {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  gap: 5rem;
+}
+
+
 .hero-btn{
-  font-size: 1rem;
-  font-weight: bold;
+  width: 180px;
+  padding: 0.6rem;
+  transition: all ease 0.3s;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: white;
+  font-family: "Playfair Display", serif;
 
 }
 
-.hero-cont button a {
+.room-btn {
+  background-color: #BFA46F;
+  border: none;
+  border: solid 1px #BFA46F;
+}
+
+.more-btn {
+  background-color: transparent;
+  border: 1px solid white;
+}
+
+
+.hero-btn-cont a {
   text-decoration: none;
   color: white;
   background-color: none;
 }
 
+.room-btn:hover {
+  background-color: transparent;
+  /* border: 1px solid white; */
+  transform: translateY(-2px);
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.25);
+}
+
+.more-btn:hover {
+  border: #BFA46F 1px solid;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.25);
+}
+
+
+/* ROOM INFO SLIDE CSS */
+
+.room-info {
+  width: 100%;
+  padding: 2rem;
+  padding-top: 4rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5rem;
+  /* background-color: #FAF7F2; */
+  background-color: white;
+}
+
+
+.room-hero {
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+  align-items: center;
+  gap: 2rem;
+}
+
+.room-hero h3 {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 2.5rem;
+  font-weight: 600;
+  position: relative;
+}
+
+.room-hero h3::after{
+  content: "";
+  position: absolute;
+  bottom: -2rem;
+  left: 20%;
+  width: 60%;
+  height: 2px;
+  background-color: #B8965A;
+}
+
+.room-hero  p {
+  font-family: 'Montserrat', sans-serif;
+  letter-spacing: 0.3rem;
+  font-weight: 600;
+  font-size: 1rem;
+  color: #B8965A;
+}
 
 
 
+/* Room INFO TABS CSS */
 
+.tab-nav {
+    display: flex;
+    justify-content: center;
+    gap: 0;
+    border: 1px solid #BFA46F;
+    width: fit-content;
+    margin: 0 auto 4rem;
+    background: #F5F0E8;
+  }
+
+  .tab-btn {
+    background-color: none;
+    border: none;
+    padding: 1rem 2.5rem;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.8rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: #8A8070;
+    cursor: pointer;
+    position: relative;
+    transition: color 0.3s;
+  }
+
+  .tab-btn + .tab-btn {
+    border-left: 1px solid #BFA46F;
+  }
+
+  .tab-btn::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 2px;
+    background: #B8965A;
+    transform: scaleX(0);
+    transition: transform 0.3s;
+  }
+
+  .tab-btn.active {
+    color: #1A1814;
+    background: white;
+  }
+
+  .tab-btn.active::after {
+    transform: scaleX(1);
+  }
+
+  /* ── ROOM ClASS ── */
+
+  .room-class {
+    position: relative;
+    width: 80%;
+    max-height: 800px;
+    flex-direction: row;
+    display: none;
+    animation: panelFade 0.5s ease forwards;
+    border: 1px solid #B8965A;
+  }
+
+  .room-class.active { display: flex; }
+
+  @keyframes panelFade {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+.img-side {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 60%;
+  height: 100%;
+  background-color: #1A1814;
+}   
+
+.img-side img{
+  width: 100%;
+  height: 50%;
+}
+
+.card-head {
+  position: absolute;
+  top: 30px;
+  left: 30px;
+}

@@ -6,34 +6,54 @@
     <title>{% block title %}Hättan Palace{% endblock %}</title>
     <link rel="stylesheet" href="/static/main.css">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair:ital,opsz,wght@0,5..1200,300..900;1,5..1200,300..900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Playfair:ital,opsz,wght@0,5..1200,300..900;1,5..1200,300..900&display=swap" rel="stylesheet">
 </head>
 <body>
     <nav>
         <div class="upper-nav">
-            <div class="upp-icon-nav">
-            
-                <span class="material-symbols-outlined icon">location_on</span>
-                Centrum, Trollhättan
+            <div class="left-upper-nav">
+                <div class="upp-icon-nav">
                 
+                    <span class="material-symbols-outlined icon">location_on</span>
+                    Centrum, Trollhättan
+                    
+                </div>
+                <div class="upp-icon-nav">
+                    <span class="material-symbols-outlined icon">mail</span>
+                    HättanPservice@gmail.com
+                </div> 
             </div>
-            <div class="upp-icon-nav">
-                <span class="material-symbols-outlined icon">mail</span>
-                HättanPservice@gmail.com
-            </div> 
+            <div class="right-upper-nav">
+                <div class="tele">
+                    <i class="fa-solid fa-phone"></i>
+                    <p>- 0736578857</p>
+                </div>
+                <a href="#">
+                    <button class="book-btn">Book Now!</button>
+                </a>
+            </div>
+
         </div>
+
         <div class="lower-nav">
             <div>
-                <img src="/static/img/navigaton/hotel-logo.png" alt="Hättan Palace Logo"> 
-                <span class="nav-line"></span>
+                <a href="/"><img src="/static/img/navigaton/hotel-logo.png" alt="Hättan Palace Logo"></a> 
             </div>
-            <ul>
-                <li><a href="/">Home</a></li>
-                <li><a href="/Rooms">Rooms</a></li>
-                {% if user %}
-                    <li><a href="/bookings">Bookings</a></li>
-                {% endif %}
-                <li><a href="/Login">Login</a></li>
-            </ul>
+            <div class="nav-links">
+                <ul>
+                    <li><a href="/">Home</a></li>
+                    <li><a href="#">About Us</a></li>
+                    <li><a href="/Rooms">Rooms</a></li>
+                    {% if user %}
+                        <li><a href="/bookings">Bookings</a></li>
+                    {% endif %}
+                </ul>
+                <span class="material-symbols-outlined ">account_box</span>
+
+            </div>
         </div>
     </nav>
 
@@ -44,5 +64,6 @@
     </footer>
     
     <script src="/static/main.js"></script>
+    <script src="https://kit.fontawesome.com/7baae8db5a.js" crossorigin="anonymous"></script>
 </body>
 </html>

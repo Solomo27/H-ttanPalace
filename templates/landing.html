@@ -6,15 +6,43 @@
     <section class="hero">
         <div class="overlay"></div>
         <div class="hero-cont">
-            <p style="color: #BFA46F;">Hotel</p>
-            <h2>Luxuary For Everyone</h2>
-            <p>5 Star Quality Since 2026</p>
+            <p style="color: #BFA46F; font-family: Playfair Display, serif;">Hotel & Resort</p>
+            <h2>The Luxuary Experince For Everyone</h2>
+            <p class="text">Luxury for everyone since 2026 in Trollhättan. We believe elegance should feel effortless and accessible, combining modern design with genuine hospitality. Stay with us and discover comfort. Every detail is crafted to make your visit unforgettable.</p>
             <div class="hero-btn-cont">
-                <div class="hero-btn room-btn"><a href="/Rooms">Rooms & Suite</a></div>
-                <div class="hero-btn more-btn"><a href="/Rooms">Know More</a></div>
+                <a  href="/Rooms"><button class="hero-btn room-btn">Rooms & Suite</button></a>
+                <a href="#"><button class="hero-btn more-btn">Know More</button></a>
             </div>
         </div>
     </section> 
+    <section class="room-info">
+        <div class="room-hero">
+            <p>OUR ACCOMODATIONS</p>
+            <h3>Designed For Every Guest <br>Chose Your Room!</h3>
+        </div>
+        <div class="tab-nav" role="tablist">
+            <button class="tab-btn active" onclick="switchTab('standard', this)" role="tab">Standard</button>
+            <button class="tab-btn" onclick="switchTab('deluxe', this)" role="tab">Deluxe</button>
+            <button class="tab-btn" onclick="switchTab('executive', this)" role="tab">Executive</button>
+        </div>
+        
+        <div class="room-class active" id="room-standard">
+            <div class="img-side">
+                <h4 class="card-head">Standard Room</h4>
+                <img src="/static/img/rooms/bed-hero.jpg" alt="Picture of a room">
+
+            </div>
+            <div class="text-side">
+                <p></p>
+            </div>
+        </div>
+        <div class="room-class" id="room-deluxe">
+            
+        </div>
+        <div class="room-class" id="room-executive">
+            <img src="" alt="">
+        </div>
+    </section>
 
 </div>
 
