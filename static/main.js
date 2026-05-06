@@ -172,11 +172,11 @@ async function sendBooking(path){
     const data = await response.json();
 
     if (response.ok) {
-      // Om success: True, skicka användaren till bokningssidan
+      
       window.location.href = "/bookings"; 
-      closeBookingOverlay()// Eller var du nu vill skicka dem
+      closeBookingOverlay()
     } else {
-      // Om det var ett fel (t.ex. redan bokat), visa en popup med felet!
+      
       toggle_booking_error(data.error) 
     }
 
@@ -200,28 +200,28 @@ async function cancelBooking(button){
   const bookingId = button.getAttribute("data-booking-id");
 
   try {
-      // Skicka anropet till din FastAPI backend
+      
     const response = await fetch(`/bookings/cancel/${bookingId}`, {
         method: 'POST'
     });
 
     if (response.ok) {
-      // -- HÄR SKER MAGIN SOM SLIPPER SIDLADDNING -- //
+     
       
-      // 1. Hitta footern där knappen och badgen ligger
+      
       const footer = button.closest('.booking-card__footer');
       
-      // 2. Hitta badgen och byt ut text och CSS-klass
+      
       const badge = footer.querySelector('.confirm-status-badge');
       if (badge) {
           badge.textContent = "Canceled";
           badge.className = "canceled-status-badge";
       }
 
-      // 3. Ta bort knappen helt från skärmen
+      
       button.remove(); 
     } else {
-      // Om backend kastar en HTTPException
+      
       const errorData = await response.json();
       alert("Could not cancel: " + (errorData.detail || "Something went wrong."));
     }
