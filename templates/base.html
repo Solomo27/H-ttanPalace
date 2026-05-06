@@ -11,7 +11,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Playfair:ital,opsz,wght@0,5..1200,300..900;1,5..1200,300..900&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Playfair:ital,opsz,wght@0,5..1200,300..900;1,5..1200,300..900&display=swap" rel="stylesheet">
 </head>
-<body>
+<body data-is-logged-in="{{ 'true' if user_id else 'false' }}">
     <nav>
         <div class="upper-nav">
             <div class="left-upper-nav">
@@ -45,23 +45,44 @@
             <div class="nav-links">
                 <ul>
                     <li><a href="/">Home</a></li>
-                    <li><a href="#">About Us</a></li>
-                    <li><a href="/Rooms">Rooms</a></li>
-                    {% if user %}
+                    <!-- <li><a href="/#about_us">About Us</a></li> -->
+                    {% if user_id %}
+                        <li><a href="/rooms">Rooms</a></li>
                         <li><a href="/bookings">Bookings</a></li>
                     {% endif %}
+                    {% if is_admin %}
+                        <li><a href="/admin">Admin</a></li>
+                    {% endif %}
+                    
                 </ul>
-                <span class="material-symbols-outlined ">account_box</span>
+
+                <span onclick="toggle_overlay()" class="material-symbols-outlined">account_box</span>
 
             </div>
         </div>
     </nav>
 
-    {% block content %}{% endblock %}
+    {% block content %}
+    
+    
+    {% endblock %}
 
     <footer>
        <p>© Hättan Palace 2026</p>
     </footer>
+
+
+
+    <div class="login-overlay" id="login-overlay">
+        <p class="greeting"></p>
+        <div class="overlay-cont">
+            <h2 class="overlay-title" id="overlay-title">Sign in to book!</h2>
+            <div class="overlay-btns" id="overlay-btns">
+            </div>
+            <button onclick="toggle_overlay()" class="close-btn">Close</button>
+        </div>
+    </div>
+
     
     <script src="/static/main.js"></script>
     <script src="https://kit.fontawesome.com/7baae8db5a.js" crossorigin="anonymous"></script>

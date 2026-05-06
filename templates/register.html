@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block content %}
+
+    <section class="login_page">
+
+        <form method="POST" action="/signup">
+            
+            <div class="inp-cont">
+                <label for="fullname">Fullname:</label>
+                <input id="fullname" name="fullname" type="text" placeholder="First and lastname" required>
+            </div>
+            
+            <div class="inp-cont">
+                <label for="email">Email:</label>
+                <input id="email" name="email" type="email" placeholder="Example@gmail.com" required>                
+            </div>
+
+            <div class="inp-cont">
+                <label for="password">Password:</label>
+                <input id="password" name="password" type="password" placeholder="*****" required>
+            </div>
+
+            <div class="inp-cont">
+                <label for="password">Confirm Password:</label>
+                <input id="conf_password" name="conf_password" type="password" placeholder="*****" required>
+            </div>
+
+            <div class="sub-cont">
+                <button  type="submit" class="login-btn">Sign Up</button>
+            </div>
+        </form>
+        <div class="have-acc">
+            <p>Already have an account?</p>
+            <a href="/login"><button class="sign-btn">Login</button></a>
+        </div>
+
+    </section>
+
+
+{% endblock %}

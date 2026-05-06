@@ -1,0 +1,138 @@
+{% extends "base.html" %}
+{% block content %}
+    <section class="rooms-page">
+
+        <div class="booking-section">
+            <div class="book-overlay"></div>
+            <form id="search-form" class="search-bar" method="POST" action="/rooms/search">
+        
+                <div class="input-group">
+                    <label for="checkin">Check-in</label>
+                    <input type="date" id="checkin" name="checkin" value="{{ checkin }}" required>
+                </div>
+                <div class="input-group">
+                    <label for="checkout">Check-out</label>
+                    <input type="date" id="checkout" name="checkout" value="{{ checkout }}" required>
+                </div>
+                <div class="input-group">
+                    <label for="guests">Guests</label>
+                    <input type="number" id="guests" name="guests" min="1" max="10" value="{{ guests or 2 }}" required>
+                </div>
+                <button type="submit" class="search-btn">Search Rooms</button>
+            </form>
+            {% if error %}
+                <p class="search-error">{{ error }}</p>
+            {% endif %}
+            
+        </div>
+
+        
+        {% if rooms %}
+
+            <div class="current_rooms-cont" id="current-rooms">
+
+                <div class="current-rooms-header">
+                    <h3>Available Rooms</h3>
+                    
+                    <div class="avialable-cont">
+                        <span>From: <span class="available-light">{{ checkin }}</span> </span>
+                        <span>To: <span class="available-light">{{ checkout }}</span></span>
+                    </div>
+                </div>
+                
+
+
+                {% for room in rooms %}
+
+                    <div class="search-room-card fade-in">
+
+                        <div class="room-card__image">
+                            <img src="{{ room.image_url }}" alt="Room {{ room.room_number }}">
+                            <span class="room-card__badge">{{ room.room_class }}</span>
+                        </div>
+
+                        <div class="room-card__body">
+
+                            <div class="room-card__header">
+                                <div>
+                                    <p class="room-card__label">Room</p>
+                                    <h2 class="room-card__number">#{{ room.room_number }}</h2>
+                                </div>
+                                <div class="room-card__price">
+                                    <span class="room-card__price-amount">${{ room.price_per_night }}</span>
+                                    <span class="room-card__price-unit">/ night</span>
+                                </div>
+                            </div>
+
+                            <div class="room-card__meta">
+                                <div class="room-card__meta-item">
+                                    <span class="meta-icon">👥</span>
+                                    <span>Up to <strong>{{ room.max_guests }}</strong> guests</span>
+                                </div>
+                                <div class="room-card__meta-item">
+                                    <span class="meta-icon">🏨</span>
+                                    <span>{{ room.room_class | upper }} Class</span>
+                                </div>
+                            </div>
+
+                            <button
+                                class="room-card__book-btn"
+                                onclick="openBookOverlay(
+                                '{{ room.id }}', 
+                                '{{ room.room_number }}', 
+                                '{{ room.room_class }}',
+                                '{{ room.price_per_night }}')">
+                                Book Now
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                {% endfor %}
+
+            </div>
+
+        {% endif %}
+
+
+        <div id="booking-overlay" class="booking-overlay">
+            <div class="booking-content">
+                <h2>Confirm Your Booking</h2>
+                <hr style="border: 0; border-top: 1px solid #d4af37; margin: 10px 0;">
+
+                <div class="booking-summary">
+                    <p><strong>Room:</strong> <span id="modal-room-name" ></span></p>
+                    <p><strong>Check-in:</strong> <span id="modal-checkin" ></span></p>
+                    <p><strong>Check-out:</strong> <span id="modal-checkout" ></span></p>
+                    <p><strong>Guests:</strong> <span id="modal-guests" ></span></p>
+                    <hr style="border: 0; border-top: 1px solid #d4af37; margin: 10px 0;">
+                    <p style="font-size: 1.2rem;"><strong>Total:</strong> $<span id="modal-total-price"></span></p>
+                </div>
+                
+                <hr style="border: 0; border-top: 1px solid #d4af37; margin: 10px 0;">
+
+                <div class="booking-btn-group" style="display: flex; gap: 10px;">
+                    <button onclick="closeBookingOverlay()" class="book-btn-deactivate">Cancel</button>
+                    <button id="confirm-book-btn" class="book-btn-activate">Yes, Book it!</button>
+                </div>
+
+                <p class="booking-error-msg" id="booking-error-msg"></p>
+            </div>
+        </div>
+    </section>
+    {% if rooms %}
+        <script>
+            // Vänta tills sidan har laddats helt
+            window.addEventListener('DOMContentLoaded', (event) => {
+                const resultsSection = document.getElementById('current-rooms');
+                if (resultsSection) {
+                    resultsSection.scrollIntoView({ 
+                        behavior: 'smooth', // Gör scrollningen mjuk
+                        block: 'start'      // Placerar sektionen högst upp på skärmen
+                    });
+                }
+            });
+        </script>
+    {% endif %}
+{% endblock %}

@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block content %}
+    <section class="login_page">
+
+        <form method="POST" action="/login">
+            
+            
+            <div class="inp-cont">
+                <label for="email">Email:</label>
+                <input id="email" name="email" type="email" placeholder="Example@gmail.com" required>                
+            </div>
+
+            <div class="inp-cont">
+                <label for="password">Password:</label>
+                <input id="password" name="password" type="password" placeholder="*****" required>
+            </div>
+
+            <div class="sub-cont">
+                <button  type="submit" class="login-btn">Login</button>
+            </div>
+        </form>
+        <div class="have-acc">
+            <p>Dont have an account?</p>
+            <a href="/signup"> <button class="sign-btn">Sign up</button> </a>
+        </div>
+
+        {% if error %}
+            <p class="login-error" >{{ error }}</p>
+        {% endif %}
+
+    </section>
+
+
+{% endblock %}

@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block content %}
+    <section class="bookings-page-cont">
+        <div class="bookings-page">
+            <div class="bookings-container">
+                <h2 class="bookings-title">My Bookings</h2>
+                
+                <div class="my_bookings">
+                    {% for booking in bookings %}
+                        <div class="booking-card fade-in">
+                            <div class="booking-card__header">
+                                <span class="booking-id">Booking #{{ booking.id }}</span>
+                                <span class="booking-date">Booked: {{ booking.created_at.strftime('%Y-%m-%d') if booking.created_at else 'N/A' }}</span>
+                            </div>
+                            
+                            <div class="booking-card__body">
+                                <div class="bookings-info">
+                                    <div class="info-group">
+                                        <label>Room</label>
+                                        <p>#{{ booking.room.room_number }} ({{ booking.room.room_class | upper }})</p>
+                                    </div>
+                                    <div class="info-group">
+                                        <label>Stay</label>
+                                        <p>{{ booking.checkin_date }} — {{ booking.checkout_date }}</p>
+                                    </div>
+                                    <div class="info-group">
+                                        <label>Guests</label>
+                                        <p>{{ booking.guests }} People</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="booking-price">
+                                    <label>Total Price</label>
+                                    <p class="price-amount">${{ booking.total_price }}</p>
+                                </div>
+                            </div>
+                            
+                            <div class="booking-card__footer">
+                                {% if booking.status %}
+                                    <span class="confirm-status-badge">Confirmed</span>
+                                    <button class="cancel-book-btn" onclick="cancelBooking(this)" data-booking-id="{{ booking.id }}">Cancel</button>
+                                {% else %}
+                                    <span class="canceled-status-badge">Canceled</span>
+                                {% endif %}
+                                
+                            </div>
+                        </div>
+                    {% else %}
+                        <div class="no-bookings">
+                            <p>No available bookings found.</p>
+                            <a href="/rooms" class="book-now-link">Find a room to book</a>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}

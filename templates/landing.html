@@ -10,38 +10,237 @@
             <h2>The Luxuary Experince <br> For Everyone</h2>
             <p class="text">Luxury for everyone since 2026 in Trollhättan. We believe elegance should feel effortless and accessible, <br>combining modern design with genuine hospitality. Stay with us and discover comfort. Every detail is crafted to make your visit unforgettable.</p>
             <div class="hero-btn-cont">
-                <a  href="/Rooms"><button class="hero-btn room-btn">Rooms & Suite</button></a>
+                <a  href="/#room-info-cont"><button class="hero-btn room-btn">Rooms & Suite</button></a>
                 <a href="#"><button class="hero-btn more-btn">Know More</button></a>
             </div>
         </div>
     </section> 
-    <section class="room-info">
+    <section class="room-info" id="room-info-cont">
         <div class="room-hero">
             <p>OUR ACCOMODATIONS</p>
             <h3>Designed For Every Guest <br>Chose Your Room!</h3>
         </div>
-        <div class="tab-nav" role="tablist">
-            <button class="tab-btn active" onclick="switchTab('standard', this)" role="tab">Standard</button>
-            <button class="tab-btn" onclick="switchTab('deluxe', this)" role="tab">Deluxe</button>
-            <button class="tab-btn" onclick="switchTab('executive', this)" role="tab">Executive</button>
-        </div>
         
-        <div class="room-class active" id="room-standard">
-            <div class="img-side">
-                <h4 class="card-head">Standard Room</h4>
-                <img src="/static/img/rooms/bed-hero.jpg" alt="Picture of a room">
+        
+        <div class="room-cont">
 
+            <div class="tab-nav" role="tablist">
+                <button class="tab-btn active" onclick="switchTab('standard', this)" role="tab">Standard</button>
+                <button class="tab-btn" onclick="switchTab('deluxe', this)" role="tab">Deluxe</button>
+                <button class="tab-btn" onclick="switchTab('executive', this)" role="tab">Executive</button>
             </div>
-            <div class="text-side">
-                <p></p>
-            </div>
-        </div>
-        <div class="room-class" id="room-deluxe">
+
+            <!-- Standard ROOM -->
+
+            <div class="room-panel active" id="room-standard">
+                <div class="room-card">
+
+                    <div class="room-photo-col">
+                        <div class="room-hero-photo">
+                            <img id="main-img-standard"
+                            src="/static/img/rooms/standard-room.jpg"
+                            alt="Standard Room — Bedroom" />
+                            <div class="photo-badge">Standard Room</div>
+                            <div class="photo-price">
+                                <span class="from">from</span>
+                                <span class="amount">$149</span>
+                                <span class="night">/night</span>
+                            </div>
+                        </div>
+
+                        <div class="photo-strip">
+                            <!-- ↓ REPLACE each src with your own thumbnail (400×300px) + onclick large URL -->
+                            <div class="photo-thumb"
+                                onclick="swapPhoto('standard', this, '/static/img/rooms/standard-bed.jpg')">
+                                <img src="/static/img/rooms/standard-bed.jpg" alt="Bedroom" />
+                                <span class="photo-thumb-label">Bedroom</span>
+                            </div>
+                            <div class="photo-thumb"
+                                onclick="swapPhoto('standard', this, '/static/img/rooms/standard-bath.jpg')">
+                                <img src="/static/img/rooms/standard-bath.jpg" alt="Bathroom" />
+                                <span class="photo-thumb-label">Bathroom</span>
+                            </div>
+                            <div class="photo-thumb"
+                                onclick="swapPhoto('standard', this, '/static/img/rooms/room-view.jpg')">
+                                <img src="/static/img/rooms/room-view.jpg" alt="View" />
+                                <span class="photo-thumb-label">View</span>
+                            </div>
+                        </div>
+                    </div>
+                
             
-        </div>
-        <div class="room-class" id="room-executive">
-            <img src="" alt="">
-        </div>
+
+                    <div class="room-card-info">
+                        <p class="room-tier">Standard Room · 32 m²</p>
+                        <h3 class="room-title">Classic<br><em>Comfort</em></h3>
+                        <p class="room-size">King or Twin Bed · City &amp; Garden Views</p>
+                        <div class="info-divider"></div>
+                        <p class="room-desc">
+                            A beautifully appointed retreat that blends thoughtful design with essential luxury — perfect for the traveler who values comfort without compromise.
+                        </p>
+                        <ul class="amenities">
+                            <li>King or Twin Bed</li>
+                            <li>Free High-Speed WiFi</li>
+                            <li>32" Smart TV</li>
+                            <li>Rain Shower</li>
+                            <li>In-Room Safe</li>
+                            <li>Mini Fridge</li>
+                            <li>Daily Housekeeping</li>
+                            <li>City or Garden View</li>
+                        </ul>
+                        <div class="room-actions">
+                            <button class="btn-book book_btn_trigger" onclick="btn_book_overlay()">Book Now</button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- DELUXE ROOM -->
+
+            <div class="room-panel" id="room-deluxe">
+                <div class="room-card">
+
+                    <div class="room-photo-col">
+                        <div class="room-hero-photo">
+                            <!-- ↓ REPLACE with your photo. Recommended: 1400×900px, well-lit bedroom shot -->
+                            <img id="main-img-standard"
+                            src="/static/img/rooms/deluxe-room.jpg"
+                            alt="Standard Room — Bedroom" />
+                            <div class="photo-badge">Deluxe Room</div>
+                            <div class="photo-price">
+                                <span class="from">from</span>
+                                <span class="amount">$249</span>
+                                <span class="night">/night</span>
+                            </div>
+                        </div>
+
+                        <div class="photo-strip">
+                            <!-- ↓ REPLACE each src with your own thumbnail (400×300px) + onclick large URL -->
+                            <div class="photo-thumb active-thumb"
+                                onclick="swapPhoto('standard', this, 'https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=1400&q=80')">
+                                <img src="/static/img/rooms/deluxe-bed.jpg" alt="Bedroom" />
+                                <span class="photo-thumb-label">Bedroom</span>
+                            </div>
+                            <div class="photo-thumb"
+                                onclick="swapPhoto('standard', this, 'https://images.unsplash.com/photo-1552902865-b72c031ac5ea?w=1400&q=80')">
+                                <img src="/static/img/rooms/deluxe-bath.jpg" alt="Bathroom" />
+                                <span class="photo-thumb-label">Bathroom</span>
+                            </div>
+                            <div class="photo-thumb"
+                                onclick="swapPhoto('standard', this, 'https://images.unsplash.com/photo-1564078516393-cf04bd966897?w=1400&q=80')">
+                                <img src="/static/img/rooms/room-view.jpg" alt="View" />
+                                <span class="photo-thumb-label">View</span>
+                            </div>
+                        </div>
+                    </div>
+                
+            
+
+                    <div class="room-card-info">
+                        <p class="room-tier">Deluxe Room · 48 m²</p>
+                        <h3 class="room-title">Elevated<br><em>Elegance</em></h3>
+                        <p class="room-size">Grand King Bed · City &amp; Garden Views</p>
+                        <div class="info-divider"></div>
+                        <p class="room-desc">
+                            Step into heightened sophistication. Generous spaces adorned with premium furnishings and panoramic views that make every morning unforgettable.
+                        </p>
+                        <ul class="amenities">
+                            <li>Grand King bed</li>
+                            <li>Seperate Seating Area</li>
+                            <li>55" 4k Smart TV</li>
+                            <li>Nespresso Machine</li>
+                            <li>Welcome Package</li>
+                            <li>Soaking Tub & Shower</li>
+                            <li>Evening Turndown</li>
+                            <li>City or Garden View</li>
+                        </ul>
+                        <div class="room-actions">
+                            <button class="btn-book book_btn_trigger" onclick="btn_book_overlay()">Book Now</button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- EXECUTIVE ROOM -->
+
+            <div class="room-panel" id="room-executive">
+                <div class="room-card">
+
+                    <div class="room-photo-col">
+                        <div class="room-hero-photo">
+                            <!-- ↓ REPLACE with your photo. Recommended: 1400×900px, well-lit bedroom shot -->
+                            <img id="main-img-standard"
+                            src="/static/img/rooms/executive-room.jpg"
+                            alt="Executive Room" />
+                            <div class="photo-badge">Executive Room</div>
+                            <div class="photo-price">
+                                <span class="from">from</span>
+                                <span class="amount">$449</span>
+                                <span class="night">/night</span>
+                            </div>
+                        </div>
+
+                        <div class="photo-strip">
+                            <!-- ↓ REPLACE each src with your own thumbnail (400×300px) + onclick large URL -->
+                            <div class="photo-thumb active-thumb"
+                                onclick="swapPhoto('standard', this, 'https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=1400&q=80')">
+                                <img src="/static/img/rooms/executivee-bed.jpg" alt="Bedroom" />
+                                <span class="photo-thumb-label">Bedroom</span>
+                            </div>
+                            <div class="photo-thumb"
+                                onclick="swapPhoto('standard', this, 'https://images.unsplash.com/photo-1552902865-b72c031ac5ea?w=1400&q=80')">
+                                <img src="/static/img/rooms/executive-bath.jpg" alt="Bathroom" />
+                                <span class="photo-thumb-label">Bathroom</span>
+                            </div>
+                            <div class="photo-thumb"
+                                onclick="swapPhoto('standard', this, 'https://images.unsplash.com/photo-1564078516393-cf04bd966897?w=1400&q=80')">
+                                <img src="https://images.unsplash.com/photo-1564078516393-cf04bd966897?w=400&q=70" alt="View" />
+                                <span class="photo-thumb-label">View</span>
+                            </div>
+                        </div>
+                    </div>
+                
+            
+
+                    <div class="room-card-info">
+                        <p class="room-tier">Executive Room · 80 m²</p>
+                        <h3 class="room-title">Best of<br><em>Luxuary</em></h3>
+                        <p class="room-size">Grand King Suite · Exclusive Skyline Views &amp; Garden Views</p>
+                        <div class="info-divider"></div>
+                        <p class="room-desc">
+                            The ultimate expression of refined living. Bespoke furnishings, floor-to-ceiling views, and a dedicated butler — every detail crafted around you.
+                        </p>
+                        <ul class="amenities">
+                            <li>Grand King Suite</li>
+                            <li>65" OLED TV</li>
+                            <li>Champagne on Arrival</li>
+                            <li>Floor to Ceiling Views</li>
+                            <li>Butler Service</li>
+                            <li>Private Jacuzzi</li>
+                            <li>Lounge Access</li>
+                            <li>Private Dining Option</li>
+                        </ul>
+                        <div class="room-actions">
+                            <button class="btn-book book_btn_trigger" onclick="btn_book_overlay()">Book Now</button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        <div>
+    
+
+
+
+
+    
+    </section>
+
+    <section class="about-us" id="about_us">
+
     </section>
 
 </div>
