@@ -53,8 +53,9 @@ def get_landing_page(request: Request):
     is_admin = request.session.get("admin")
 
     return templates.TemplateResponse(
-        "landing.html",
-        {"request": request, 
+        request=request,
+        name="landing.html",
+        context={"request": request, 
          "user_id": current_user_id,
          "is_admin": is_admin}
     )
@@ -62,15 +63,17 @@ def get_landing_page(request: Request):
 @app.get("/login")
 def get_login_page(request: Request):
     return templates.TemplateResponse(
-        "login.html",
-        {"request": request}
+        request=request,
+        name="login.html",
+        context={"request": request}
     )
 
 @app.get("/signup")
 def get_signup_page(request: Request):
     return templates.TemplateResponse(
-        "register.html",
-        {"request": request}
+        request=request,
+        name="register.html",
+        context={"request": request}
     )
 
 
@@ -81,8 +84,9 @@ def get_room_page(request: Request):
     is_admin = request.session.get("admin")
 
     return templates.TemplateResponse(
-        "rooms.html",
-        {"request": request, 
+        request=request,
+        name="rooms.html",
+        context={"request": request, 
          "user_id": current_user_id,
          "is_admin": is_admin
         }
@@ -104,8 +108,9 @@ def get_room_page(request: Request, db: Session=Depends(get_db)):
     
     
     return templates.TemplateResponse(
-        "bookings.html",
-        {"request": request, 
+        request=request,
+        name="bookings.html",
+        context={"request": request, 
          "user_id": current_user_id,
          "is_admin": is_current_admin,
          "bookings": my_bookings
@@ -125,8 +130,9 @@ def get_admin_page(request: Request, db: Session = Depends(get_db)):
 
 
     return templates.TemplateResponse(
-        "admin.html",
-        {"request": request, 
+        request=request,
+        name="admin.html",
+        context={"request": request, 
          "user_id": current_user_id,
          "is_admin": is_admin,
          "rooms": rooms,
@@ -178,8 +184,9 @@ def post_login_toPage(request: Request, email: str = Form(...), password: str = 
     if not user or user.password != password:
 
         return templates.TemplateResponse(
-            "login.html",
-            {   
+            request=request,
+            name="login.html",
+            context={   
                 "request": request,
                 "error": "Wrong email or password!"
             }
@@ -241,8 +248,9 @@ def get_availabel_rooms(
 
     if not available_rooms or checkin>=checkout:
         return templates.TemplateResponse(
-            "rooms.html",
-            {    "request": request,
+            request=request,
+            name="rooms.html",
+            context={    "request": request,
                "user_id": current_user_id,
                 "is_admin": is_admin,
                 "error": "There is no room available for this period."
@@ -250,8 +258,9 @@ def get_availabel_rooms(
         )
 
     return templates.TemplateResponse(
-        "rooms.html", 
-        {
+        request=request,
+        name="rooms.html", 
+        context={
             "request": request,
             "rooms": available_rooms,
             "checkin": checkin,
