@@ -33,6 +33,9 @@
             <p>Already have an account?</p>
             <a href="/login"><button class="sign-btn">Login</button></a>
         </div>
+        {% if error %}
+            <p class="login-error" >{{ error }}</p>
+        {% endif %}
 
     </section>
 

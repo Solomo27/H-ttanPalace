@@ -201,7 +201,18 @@ def post_login_toPage(request: Request, email: str = Form(...), password: str = 
     return RedirectResponse("/", status_code=302)
 
 @app.post("/signup")
-def post_signup_page(request: Request, fullname: str = Form(...), email: str = Form(...), password: str = Form(...), db: Session = Depends(get_db) ):
+def post_signup_page(request: Request, fullname: str = Form(...), email: str = Form(...), password: str = Form(...), conf_password: str = Form(...), db: Session = Depends(get_db) ):
+    
+
+    if password != conf_password:
+        return templates.TemplateResponse(
+            request=request,
+            name="register.html",
+            context={   
+                "request": request,
+                "error": "Wrong email or password!"
+            }
+        ) 
     
     user = User(fullname=fullname, email=email, password=password)
     db.add(user)
