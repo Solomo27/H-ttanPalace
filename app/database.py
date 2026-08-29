@@ -1,7 +1,8 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, declarative_base
 
-DATABASE_URL = "postgresql://hatan_palace_db_envb_user:CrInGP3c2bGSvk881a5MChVsuEn87UWs@dpg-d7toedbtqb8s73d5pplg-a/hatan_palace_db_envb"
+# DATABASE_URL = "postgresql://hatan_palace_db_envb_user:CrInGP3c2bGSvk881a5MChVsuEn87UWs@dpg-d7toedbtqb8s73d5pplg-a/hatan_palace_db_envb"
+DATABASE_URL = "postgresql://hattanpalace_db_user:5nTifYEwH340IIFxUGlQs6p8BIKS7jzA@dpg-da941a942hec73el9pvg-a/hattanpalace_db"
 
 
 engine = create_engine(DATABASE_URL)

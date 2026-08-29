@@ -11,7 +11,8 @@ class User(Base):
     email = Column(String, unique=True, index=True)
     password = Column(String)
     is_admin = Column(Boolean, default=False)
-
+    reset_token = Column(String, nullable=True)
+    reset_token_expires = Column(DateTime, nullable=True)
     bookings = relationship("Booking", back_populates="user")
 
 class Room(Base):
@@ -39,6 +40,9 @@ class Booking(Base):
     total_price = Column(Integer)
     guests = Column(Integer)
     created_at = Column(DateTime, server_default=func.now())
+
+    payment_status = Column(String, default="pending_payment") 
+    stripe_session_id = Column(String, nullable=True)
 
     user = relationship("User", back_populates="bookings")
     room = relationship("Room", back_populates="bookings")

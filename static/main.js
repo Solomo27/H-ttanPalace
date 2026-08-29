@@ -173,7 +173,7 @@ async function sendBooking(path){
 
     if (response.ok) {
       
-      window.location.href = "/bookings"; 
+      window.location.href = data.checkout_url; 
       closeBookingOverlay()
     } else {
       
@@ -230,9 +230,27 @@ async function cancelBooking(button){
         alert("A network error occurred.");
   }
 
-
-
-
-
-
 }
+
+document.addEventListener("DOMContentLoaded", () => {
+  const hamburger = document.getElementById('hamburger');
+  const navUl = document.getElementById('nav-ul');
+  const body = document.body;
+  const navLinks = document.querySelectorAll('#nav-ul a');
+
+  // Toggle menu when clicking hamburger
+  hamburger.addEventListener('click', () => {
+    hamburger.classList.toggle('active');
+    navUl.classList.toggle('active');
+    body.classList.toggle('no-scroll');
+  });
+
+  // Close the menu if a user clicks a link (crucial for one-page sites)
+  navLinks.forEach(link => {
+    link.addEventListener('click', () => {
+      hamburger.classList.remove('active');
+      navUl.classList.remove('active');
+      body.classList.remove('no-scroll');
+    });
+  });
+});

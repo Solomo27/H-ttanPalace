@@ -43,7 +43,7 @@
                 <a href="/"><img src="/static/img/navigaton/hotel-logo.png" alt="Hättan Palace Logo"></a> 
             </div>
             <div class="nav-links">
-                <ul>
+                <ul id="nav-ul">
                     <li><a href="/">Home</a></li>
                     <!-- <li><a href="/#about_us">About Us</a></li> -->
                     {% if user_id %}
@@ -57,6 +57,12 @@
                 </ul>
 
                 <span onclick="toggle_overlay()" class="material-symbols-outlined">account_box</span>
+
+                <button class="hamburger" id="hamburger">
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                </button>
 
             </div>
         </div>

@@ -10,7 +10,7 @@ Session = sessionmaker(bind=engine)
 session = Session()
 
 # Hitta din användare via e-post
-email_to_promote = "Even@gmail.com"
+email_to_promote = "Evensenay04@gmail.com"
 user = session.query(User).filter(User.email == email_to_promote).first()
 
 if user:

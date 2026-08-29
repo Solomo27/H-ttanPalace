@@ -45,7 +45,7 @@
                     <div class="admin-room-info">
                         <h3>Room {{ room.room_number }}</h3>
                         <p><strong>Class:</strong> {{ room.room_class }}</p>
-                        <p><strong>Price:</strong> ${{ room.price_per_night }} / night</p>
+                        <p><strong>Price:</strong> {{ room.price_per_night }} kr / night</p>
                         <p><strong>Max guests:</strong> {{ room.max_guests }}</p>
 
                         <p class="room-status">
@@ -97,7 +97,7 @@
                         
                         <div class="booking-price">
                             <label>Total Price</label>
-                            <p class="price-amount">${{ booking.total_price }}</p>
+                            <p class="price-amount">{{ booking.total_price }} kr</p>
                         </div>
                     </div>
                     

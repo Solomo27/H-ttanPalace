@@ -31,7 +31,7 @@
                                 
                                 <div class="booking-price">
                                     <label>Total Price</label>
-                                    <p class="price-amount">${{ booking.total_price }}</p>
+                                    <p class="price-amount">{{ booking.total_price }} kr</p>
                                 </div>
                             </div>
                             
@@ -42,7 +42,6 @@
                                 {% else %}
                                     <span class="canceled-status-badge">Canceled</span>
                                 {% endif %}
-                                
                             </div>
                         </div>
                     {% else %}

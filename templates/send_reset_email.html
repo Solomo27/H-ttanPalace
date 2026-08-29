@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="send-email-page">
+
+    <form class="send-email" action="/login/forgot-password" method="post">
+
+        <label for="send-email-conf">Email Confirmation:</label>
+        <input type="email" id="send-email-conf" name="reset_email" placeholder="Enter Email" required>
+        
+        <button type="submit">Send</button>
+
+    </form>
+
+    {% if message %}
+    <p class="send-email-error">{{ message  }}</p>
+    {% endif %}
+
+</section>
+
+ 
+{% endblock %}
