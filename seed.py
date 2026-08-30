@@ -1,9 +1,11 @@
-from app.database import SessionLocal
-from app.schema import Room, User
+from app.database import SessionLocal, engine
+from app.schema import Room, User, Base
+
+Base.metadata.create_all(bind=engine)
 
 db = SessionLocal()
 
-# 1. Check if rooms already exist before adding
+#Check if rooms already exist before adding
 existing_room = db.query(Room).filter_by(room_number=101).first()
 
 if not existing_room:
@@ -26,10 +28,10 @@ if not existing_room:
     for room in rooms:
         db.add(room)
     
-    db.commit() # Notice: No arguments here!
+    db.commit() 
     print("Rooms added to database.")
 
-# 2. Check if admin exists before adding
+#Check if admin exists before adding
 existing_admin = db.query(User).filter_by(email="Evensenay04@gmail.com").first()
 
 if not existing_admin:
