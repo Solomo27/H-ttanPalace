@@ -1,6 +1,8 @@
 from app.database import SessionLocal, engine
 from app.schema import Room, User, Base
 
+Base.metadata.drop_all(bind=engine)
+
 Base.metadata.create_all(bind=engine)
 
 db = SessionLocal()
