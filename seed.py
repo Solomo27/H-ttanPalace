@@ -35,7 +35,7 @@ if not existing_room:
 existing_admin = db.query(User).filter_by(email="Evensenay04@gmail.com").first()
 
 if not existing_admin:
-    admin = User("Even Solomon", "Evensenay04@gmail.com", "1234", True, None, None)
+    admin = User(fullname="Even Solomon", email="Evensenay04@gmail.com", password="1234", is_admin=True, reset_token=None, reset_token_expires=None)
     db.add(admin)
     
     db.commit() # Notice: No arguments here!
