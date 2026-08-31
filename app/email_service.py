@@ -138,8 +138,6 @@ def send_password_reset_email(
         </html>
     """, subtype="html")
 
-    with smtplib.SMTP("smtp.gmail.com", 587, timeout=15) as smtp:
-        smtp.ehlo()
-        smtp.starttls()
-        smtp.login(email_username, email_password)
-        smtp.send_message(msg)
+    with smtplib.SMTP_SSL("smtp.gmail.com", 465) as smtp:
+            smtp.login(email_username, email_password)
+            smtp.send_message(msg)
