@@ -551,7 +551,7 @@ def send_reset_email_to_user(
     db.commit()
     
 
-    reset_link = f"http://localhost:8000/reset-password?token={reset_token}"
+    reset_link = f"{FRONTEND_URL}/reset-password?token={reset_token}"
 
     try: 
         send_password_reset_email(
