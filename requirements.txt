@@ -7,3 +7,4 @@ itsdangerous
 python-multipart
 stripe
 python-dotenv
+sendgrid
