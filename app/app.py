@@ -554,11 +554,13 @@ def send_reset_email_to_user(
     reset_link = f"{FRONTEND_URL}/reset-password?token={reset_token}"
 
     try: 
+        print(f"Starting email process for {user.email}...")
         send_password_reset_email(
             user.email,
             user.fullname,
             reset_link
         )
+        print("Finished email process!")
     except Exception as error:
         print("Password reset email failed:", error)    
 
