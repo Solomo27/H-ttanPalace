@@ -531,7 +531,7 @@ def send_reset_email_to_user(
    
     user = db.query(User).filter(User.email == reset_email).first()
 
-    if not user or (user.reset_token_expires and user.reset_token_expires > datetime.now()):
+    if not user:
         return templates.TemplateResponse(
             request=request,
             name="send_reset_email.html",
