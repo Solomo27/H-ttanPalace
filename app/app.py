@@ -186,6 +186,8 @@ def toggle_room(room_id: int, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(room)
 
+    
+
     return {"active": room.status}
 
 
