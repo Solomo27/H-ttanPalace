@@ -1,5 +1,6 @@
 from datetime import date, datetime, timedelta
 from pathlib import Path
+import logging
 import secrets
 from tempfile import template
 from fastapi import Body, FastAPI, HTTPException, Request, Form, Depends
@@ -28,8 +29,13 @@ env_path = Path(__file__).parent / ".env"
 
 load_dotenv(dotenv_path=env_path)
 
+# stripe.api_key = os.getenv("STRIPE_SECRET_KEY")
+# FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:8000")
+
 stripe.api_key = os.getenv("STRIPE_SECRET_KEY")
-FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:8000")
+FRONTEND_URL = (os.getenv("FRONTEND_URL") or os.getenv("RENDER_EXTERNAL_URL") or "http://localhost:8000").rstrip("/")
+logger = logging.getLogger(__name__)
+
 
 class_img_holder = {"standard": "/static/img/rooms/standard-bed.jpg", "deluxe": "/static/img/rooms/deluxe-bed.jpg", "executive": "/static/img/rooms/executivee-bed.jpg"}
 
@@ -275,6 +281,7 @@ def get_availabel_rooms(
 
     
     booked_rooms = db.query(Booking.room_id).filter(
+        Booking.status.is_(True),
         and_(
             Booking.checkin_date < checkout,
             Booking.checkout_date > checkin
@@ -288,7 +295,7 @@ def get_availabel_rooms(
     ).all()
 
     today = date.today()
-    if not available_rooms or checkin>=checkout or today > checkin:
+    if not available_rooms or checkin>=checkout or today > checkin  or guests < 1:
         return templates.TemplateResponse(
             request=request,
             name="rooms.html",
@@ -323,11 +330,33 @@ def book_room(
     checkin: date = Body(...),
     checkout: date = Body(...),
     guests: int = Body(...),
-    booking_price: int = Body(...),
+    # booking_price: int = Body(...),
+    booking_price: int | None = Body(None),
     db: Session = Depends(get_db)
 ):
+
+    current_user_id = request.session.get("user_id")
+    current_user = db.query(User).filter(User.id == current_user_id).first()
+    if not current_user:
+        raise HTTPException(status_code=401, detail="Please sign in before booking.")
+
+    if checkin < date.today() or checkout <= checkin or guests < 1:
+        raise HTTPException(status_code=400, detail="Please check your dates and guest count.")
+
+    # Serialize reservations for this room on PostgreSQL until this transaction ends.
+    room = db.query(Room).filter(Room.id == room_id).with_for_update().first()
+    if not room:
+        raise HTTPException(status_code=404, detail="Room not found.")
+    if not room.status:
+        raise HTTPException(status_code=409, detail="This room is unavailable.")
+    if guests > room.max_guests:
+        raise HTTPException(status_code=400, detail="Too many guests for this room.")
+    if not room.price_per_night or room.price_per_night < 0:
+        raise HTTPException(status_code=409, detail="This room has no valid price.")
+
     excisting_booking = db.query(Booking).filter(
-       Booking.room_id == room_id,
+        Booking.room_id == room_id,
+        Booking.status.is_(True),
         and_(
             Booking.checkin_date < checkout,
             Booking.checkout_date > checkin
@@ -336,8 +365,19 @@ def book_room(
     current_user_id = request.session.get("user_id")
     current_user = db.query(User).filter(User.id == current_user_id).first()
     
+    # if excisting_booking:
+    #     return JSONResponse(status_code=400, content={"error": "There is already a booking for this date."})
+
     if excisting_booking:
-        return JSONResponse(status_code=400, content={"error": "There is already a booking for this date."})
+        return JSONResponse(status_code=409, content={"error": "There is already a booking for this date. Check My Bookings for an existing payment attempt."})
+
+    if not stripe.api_key:
+        logger.error("Stripe Checkout unavailable: STRIPE_SECRET_KEY is missing.")
+        return JSONResponse(status_code=503, content={"error": "Payment is temporarily unavailable. Please try again later."})
+
+    # The browser's booking_price is only a preview; charge the database price.
+    total_price = room.price_per_night * (checkout - checkin).days
+
          
     
 
@@ -352,56 +392,120 @@ def book_room(
     )
 
     db.add(new_booking)
-    db.commit()
-    db.refresh(new_booking)
+    db.flush()  # Allocate the booking ID without persisting a failed checkout.
 
-
-    # try:
-    #     send_booking_confirmation_email(
-    #         to_email=current_user.email,
-    #         guest_name=current_user.fullname,
-    #         room_id=room_id,
-    #         checkin=checkin,
-    #         checkout=checkout,
-    #         guests=guests,
-    #         total_price=booking_price,
-    #         booking_id=new_booking.id
-    #     )
-    # except Exception as email_error:
-    #     print("Email could not be sent:", email_error)
-
-    checkout_session = stripe.checkout.Session.create(
-        mode="payment",
-        payment_method_types=["card"],
-        customer_email=current_user.email,
-        line_items=[
-            {
-                "price_data": {
-                    "currency": "sek",
-                    "product_data": {
-                        "name": f"Hattan Hotel Room {room_id}",
-                        "description": f"Check-in: {checkin}, Check-out: {checkout}, Guests: {guests}",
+    try:
+        checkout_session = stripe.checkout.Session.create(
+            mode="payment",
+            # Eligible payment methods are configured in Stripe Dashboard.
+            customer_email=current_user.email,
+            line_items=[
+                {
+                    "price_data": {
+                        "currency": "sek",
+                        "product_data": {
+                            "name": f"Hattan Hotel Room {room_id}",
+                            "description": f"Check-in: {checkin}, Check-out: {checkout}, Guests: {guests}",
+                        },
+                        "unit_amount": total_price * 100,
                     },
-                    "unit_amount": booking_price * 100,
-                },
-                "quantity": 1,
-            }
-        ],
-        metadata={
-            "booking_id": str(new_booking.id),
-            "user_id": str(current_user.id),
-        },
-        success_url=f"{FRONTEND_URL}/payment/success?session_id={{CHECKOUT_SESSION_ID}}",
-        cancel_url=f"{FRONTEND_URL}/payment/cancel?booking_id={new_booking.id}",
-    )
+                    "quantity": 1,
+                }
+            ],
+            metadata={
+                "booking_id": str(new_booking.id),
+                "user_id": str(current_user.id),
+            },
+            success_url=f"{FRONTEND_URL}/payment/success?session_id={{CHECKOUT_SESSION_ID}}",
+            cancel_url=f"{FRONTEND_URL}/payment/cancel?booking_id={new_booking.id}",
+            idempotency_key=f"booking-{secrets.token_urlsafe(24)}",
+        )
+    except stripe.StripeError as error:
+        db.rollback()
+        log_stripe_error(error)
+        return JSONResponse(status_code=503, content={"error": "Payment could not be started. Please try again later."})
 
-    new_booking.stripe_session_id = checkout_session.id
-    db.commit()
+    if not checkout_session.get("id") or not checkout_session.get("url"):
+        db.rollback()
+        logger.error("Stripe Checkout did not return a session ID and URL.")
+        return JSONResponse(status_code=503, content={"error": "Payment could not be started. Please try again later."})
 
-    return {
-        "success": True,
-        "checkout_url": checkout_session.url
-    }
+    new_booking.stripe_session_id = checkout_session["id"]
+    #__________________________________________________________________________________________________________
+    # db.commit()
+    # db.refresh(new_booking)
+
+
+    # # try:
+    # #     send_booking_confirmation_email(
+    # #         to_email=current_user.email,
+    # #         guest_name=current_user.fullname,
+    # #         room_id=room_id,
+    # #         checkin=checkin,
+    # #         checkout=checkout,
+    # #         guests=guests,
+    # #         total_price=booking_price,
+    # #         booking_id=new_booking.id
+    # #     )
+    # # except Exception as email_error:
+    # #     print("Email could not be sent:", email_error)
+
+    # checkout_session = stripe.checkout.Session.create(
+    #     mode="payment",
+    #     payment_method_types=["card"],
+    #     customer_email=current_user.email,
+    #     line_items=[
+    #         {
+    #             "price_data": {
+    #                 "currency": "sek",
+    #                 "product_data": {
+    #                     "name": f"Hattan Hotel Room {room_id}",
+    #                     "description": f"Check-in: {checkin}, Check-out: {checkout}, Guests: {guests}",
+    #                 },
+    #                 "unit_amount": booking_price * 100,
+    #             },
+    #             "quantity": 1,
+    #         }
+    #     ],
+    #     metadata={
+    #         "booking_id": str(new_booking.id),
+    #         "user_id": str(current_user.id),
+    #     },
+    #     success_url=f"{FRONTEND_URL}/payment/success?session_id={{CHECKOUT_SESSION_ID}}",
+    #     cancel_url=f"{FRONTEND_URL}/payment/cancel?booking_id={new_booking.id}",
+    # )
+
+    # new_booking.stripe_session_id = checkout_session.id
+    # db.commit()
+
+    # return {
+    #     "success": True,
+    #     "checkout_url": checkout_session.url
+    # }
+
+def log_stripe_error(error):
+    # Authentication exception messages can contain parts of API keys.
+    logger.error("Stripe request failed: type=%s code=%s parameter=%s request_id=%s",
+                 type(error).__name__, getattr(error, "code", None),
+                 getattr(error, "param", None), getattr(error, "request_id", None))
+
+
+def expire_pending_checkout(booking):
+    """Stop an open payment link before releasing its room reservation."""
+    if not booking.stripe_session_id:
+        return
+    try:
+        checkout_session = stripe.checkout.Session.retrieve(booking.stripe_session_id)
+        if checkout_session.get("payment_status") == "paid" or checkout_session.get("status") == "complete":
+            raise HTTPException(status_code=409, detail="Payment has completed or is processing. Refresh your bookings before canceling.")
+        if checkout_session.get("status") == "open":
+            stripe.checkout.Session.expire(booking.stripe_session_id)
+        elif checkout_session.get("status") != "expired":
+            raise HTTPException(status_code=409, detail="Payment status could not be verified.")
+    except stripe.StripeError as error:
+        log_stripe_error(error)
+        raise HTTPException(status_code=503, detail="Could not stop the payment. Please try again later.") from None
+
 
 @app.get("/payment/success")
 def get_succesfull_payment(
@@ -409,10 +513,18 @@ def get_succesfull_payment(
     session_id: str, 
     db: Session = Depends(get_db)
 ):
-    
-    checkout_session = stripe.checkout.Session.retrieve(session_id)
 
-    session_data = checkout_session._to_dict_recursive()
+    if not request.session.get("user_id"):
+        return RedirectResponse(url="/login", status_code=303)
+    try:
+        session_data = stripe.checkout.Session.retrieve(session_id)
+    except stripe.StripeError as error:
+        log_stripe_error(error)
+        raise HTTPException(status_code=503, detail="Could not verify payment. Please try again later.") from None
+
+    
+    # checkout_session = stripe.checkout.Session.retrieve(session_id)
+    # session_data = checkout_session._to_dict_recursive()
 
     if session_data.get("payment_status") != "paid":
         return templates.TemplateResponse(
@@ -424,9 +536,10 @@ def get_succesfull_payment(
             }
         )
 
-    booking_id = session_data.get("metadata", {}).get("booking_id")
+    # booking_id = session_data.get("metadata", {}).get("booking_id")
+    # booking = db.query(Booking).filter(Booking.id == int(booking_id)).first()
+    booking = db.query(Booking).filter(Booking.stripe_session_id == session_id).first()
 
-    booking = db.query(Booking).filter(Booking.id == int(booking_id)).first()
 
     if not booking:
         return templates.TemplateResponse(
@@ -437,6 +550,15 @@ def get_succesfull_payment(
                 "error": "Booking not found."
             }
         )
+
+    if booking.user_id != request.session.get("user_id"):
+        raise HTTPException(status_code=403, detail="Not your booking.")
+    if (not booking.status
+            or (session_data.get("metadata") or {}).get("booking_id") != str(booking.id)
+            or session_data.get("currency") != "sek"
+            or session_data.get("amount_total") != booking.total_price * 100):
+        raise HTTPException(status_code=409, detail="Payment does not match an active booking.")
+
 
     if booking.payment_status != "confirmed":
         booking.payment_status = "confirmed"
@@ -469,8 +591,21 @@ def payment_cancel(
 ):
     booking = db.query(Booking).filter(Booking.id == booking_id).first()
 
-    if booking and booking.status == "pending_payment":
-        db.delete(booking)
+
+
+    # if booking and booking.status == "pending_payment":
+    #     db.delete(booking)
+    if not request.session.get("user_id"):
+        raise HTTPException(status_code=401, detail="Please sign in.")
+    if not booking:
+        raise HTTPException(status_code=404, detail="Booking not found.")
+    if booking.user_id != request.session.get("user_id"):
+        raise HTTPException(status_code=403, detail="Not your booking.")
+
+    if booking.status and booking.payment_status == "pending_payment":
+        expire_pending_checkout(booking)
+        booking.status = False
+        booking.payment_status = "Canceled"
         db.commit()
 
     return RedirectResponse(url="/bookings", status_code=303)
@@ -491,6 +626,14 @@ def cancelBooking(
         
     if booking.user_id != request.session.get("user_id") and not request.session.get("admin"):
         raise HTTPException(status_code=403, detail="Not your booking")
+
+    if not booking.status:
+        return {"success": True, "message": "Booking already canceled"}
+    if booking.payment_status == "pending_payment":
+        expire_pending_checkout(booking)
+    
+    user = db.query(User).filter(User.id == booking.user_id).first()
+
 
     booking.status = False
     booking.payment_status = "Canceled"

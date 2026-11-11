@@ -5,6 +5,6 @@ psycopg2-binary
 jinja2
 itsdangerous
 python-multipart
-stripe
+stripe==16.1.0
 python-dotenv
 sendgrid

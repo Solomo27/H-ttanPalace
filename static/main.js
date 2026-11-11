@@ -96,11 +96,13 @@ async function toggle_roomStatus(button) {
 
 
 let currentBookingData = null
+let bookingRequestInFlight = false
+
 
 function toggle_booking_error(err_msg=""){
     const bookErrorP = document.getElementById("booking-error-msg")
     if (err_msg){
-      bookErrorP.innerHTML=err_msg
+      bookErrorP.textContent=err_msg
       bookErrorP.style.display="block"
     } else {
       bookErrorP.style.display="none"
@@ -110,6 +112,13 @@ function toggle_booking_error(err_msg=""){
 
 async function openBookOverlay(roomId, roomNumber, roomClass, pricePerNight){
 
+  
+  if (bookingRequestInFlight) return 
+  toggle_booking_error()
+  
+
+  
+  
   const bookingOverlay = document.getElementById("booking-overlay")
   bookingOverlay.style.display = "flex"
 
@@ -155,6 +164,13 @@ function setupConfirmButton() {
 }
 
 async function sendBooking(path){
+  if (bookingRequestInFlight || !currentBookingData) return
+  bookingRequestInFlight = true
+  const button = document.getElementById("confirm-book-btn")
+  const originalLabel = button.textContent
+  button.disabled = true
+  button.textContent = "Opening payment..."
+  toggle_booking_error()
   try{
     const response = await fetch(path,{
       method:"POST",
@@ -169,19 +185,30 @@ async function sendBooking(path){
       })
     })
 
-    const data = await response.json();
+    // const data = await response.json();
+    const data = await response.json().catch(() => ({}));
+
 
     if (response.ok) {
-      
+      if (!data.checkout_url) {
+        toggle_booking_error("Payment could not be opened. Please try again later.")
+        return
+      }
       window.location.href = data.checkout_url; 
       closeBookingOverlay()
     } else {
-      
-      toggle_booking_error(data.error) 
+      // toggle_booking_error(data.error) 
+      const message = data.error || (typeof data.detail === "string" ? data.detail : null)
+      toggle_booking_error(message || "Payment could not be started. Please try again later.")
     }
 
   } catch (error){
-    console.log("Fel vid kommunikation med servern:")
+    // console.log("Fel vid kommunikation med servern:")
+    toggle_booking_error("Could not reach the server. Please try again.")
+  } finally {
+    bookingRequestInFlight = false
+    button.disabled = false
+    button.textContent = originalLabel
   }
 }
 

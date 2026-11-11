@@ -103,7 +103,8 @@
                     
                     <div class="booking-card__footer">
                         {% if booking.status %}
-                            <span class="confirm-status-badge">Confirmed</span>
+                            <!-- <span class="confirm-status-badge">Confirmed</span> -->
+                            <span class="confirm-status-badge">{{ 'Confirmed' if booking.payment_status == 'confirmed' else 'Awaiting payment' }}</span>
                             <button class="cancel-book-btn" onclick="cancelBooking(this)" data-booking-id="{{ booking.id }}">Cancel</button>
                         {% else %}
                             <span class="canceled-status-badge">Canceled</span>
