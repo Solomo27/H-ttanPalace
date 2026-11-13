@@ -362,8 +362,8 @@ def book_room(
             Booking.checkout_date > checkin
         )).first()
 
-    current_user_id = request.session.get("user_id")
-    current_user = db.query(User).filter(User.id == current_user_id).first()
+    # current_user_id = request.session.get("user_id")
+    # current_user = db.query(User).filter(User.id == current_user_id).first()
     
     # if excisting_booking:
     #     return JSONResponse(status_code=400, content={"error": "There is already a booking for this date."})
@@ -387,7 +387,8 @@ def book_room(
         checkin_date=checkin,
         checkout_date=checkout,
         guests=guests,
-        total_price=booking_price,
+        # total_price=booking_price,
+        total_price=total_price,
         payment_status="pending_payment"
     )
 
@@ -419,7 +420,7 @@ def book_room(
             success_url=f"{FRONTEND_URL}/payment/success?session_id={{CHECKOUT_SESSION_ID}}",
             cancel_url=f"{FRONTEND_URL}/payment/cancel?booking_id={new_booking.id}",
             idempotency_key=f"booking-{secrets.token_urlsafe(24)}",
-        )
+        ).to_dict()
     except stripe.StripeError as error:
         db.rollback()
         log_stripe_error(error)
@@ -431,6 +432,12 @@ def book_room(
         return JSONResponse(status_code=503, content={"error": "Payment could not be started. Please try again later."})
 
     new_booking.stripe_session_id = checkout_session["id"]
+    db.commit()
+
+    return {
+        "success": True,
+        "checkout_url": checkout_session["url"]
+    }
     #__________________________________________________________________________________________________________
     # db.commit()
     # db.refresh(new_booking)
@@ -495,7 +502,7 @@ def expire_pending_checkout(booking):
     if not booking.stripe_session_id:
         return
     try:
-        checkout_session = stripe.checkout.Session.retrieve(booking.stripe_session_id)
+        checkout_session = stripe.checkout.Session.retrieve(booking.stripe_session_id).to_dict()
         if checkout_session.get("payment_status") == "paid" or checkout_session.get("status") == "complete":
             raise HTTPException(status_code=409, detail="Payment has completed or is processing. Refresh your bookings before canceling.")
         if checkout_session.get("status") == "open":
@@ -517,7 +524,7 @@ def get_succesfull_payment(
     if not request.session.get("user_id"):
         return RedirectResponse(url="/login", status_code=303)
     try:
-        session_data = stripe.checkout.Session.retrieve(session_id)
+        session_data = stripe.checkout.Session.retrieve(session_id).to_dict()
     except stripe.StripeError as error:
         log_stripe_error(error)
         raise HTTPException(status_code=503, detail="Could not verify payment. Please try again later.") from None
@@ -619,7 +626,7 @@ def cancelBooking(
     db: Session = Depends(get_db)
 ):
     booking = db.query(Booking).filter(Booking.id == booking_id).first()
-    user = db.query(User).filter(User.id == booking.user_id).first()
+    # user = db.query(User).filter(User.id == booking.user_id).first()
 
     if not booking:
         raise HTTPException(status_code=404, detail="Booking not found")

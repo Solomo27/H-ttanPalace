@@ -1,40 +1,94 @@
+import json
+import logging
 import os
-from sendgrid import SendGridAPIClient
-from sendgrid.helpers.mail import Mail, Email, To, Content
+from html import escape
+from urllib.error import HTTPError, URLError
+from urllib.request import Request, urlopen
+
+logger = logging.getLogger(__name__)
+BREVO_EMAIL_URL = "https://api.brevo.com/v3/smtp/email"
+EMAIL_TIMEOUT_SECONDS = 15
 
 
-def _send_email(to_email: str, subject: str, html_content: str):
+class EmailDeliveryError(RuntimeError):
+    """An email request failed or its acceptance could not be confirmed."""
+
+
+def _send_email(to_email: str, subject: str, html_content: str) -> dict:
+    """Submit one transactional email to Brevo over HTTPS.
+
+    Returns Brevo's message ID after acceptance. Actual delivery is tracked in
+    Brevo's transactional logs. Calls are not retried automatically because an
+    interrupted response can leave delivery uncertain.
     """
-    Sends email using SendGrid API instead of Gmail SMTP.
-    This works better on Render Free because it uses HTTPS/API, not SMTP ports.
-    """
+    api_key = os.getenv("BREVO_API_KEY", "").strip()
+    from_email = os.getenv("EMAIL_FROM_EMAIL", "").strip()
+    from_name = os.getenv("EMAIL_FROM_NAME", "Hattan Palace").strip() or "Hattan Palace"
+    recipient = to_email.strip()
 
-    sendgrid_api_key = os.getenv("SENDGRID_API_KEY")
-    from_email = os.getenv("EMAIL_FROM_EMAIL", "hattanpalace@gmail.com")
-    from_name = os.getenv("EMAIL_FROM_NAME", "Hattan Palace")
+    if not api_key:
+        raise EmailDeliveryError("BREVO_API_KEY is missing from environment variables.")
+    if not api_key.isascii() or any(character.isspace() for character in api_key):
+        raise EmailDeliveryError("BREVO_API_KEY must be a single line without whitespace.")
+    if not from_email:
+        raise EmailDeliveryError("EMAIL_FROM_EMAIL must match a verified sender in Brevo.")
+    if not recipient:
+        raise EmailDeliveryError("A recipient email address is required.")
 
-    if not sendgrid_api_key:
-        raise Exception("SENDGRID_API_KEY is missing from environment variables.")
-
-    message = Mail(
-        from_email=Email(from_email, from_name),
-        to_emails=To(to_email),
-        subject=subject,
-        html_content=Content("text/html", html_content)
+    payload = {
+        "sender": {"email": from_email, "name": from_name},
+        "to": [{"email": recipient}],
+        "subject": subject,
+        "htmlContent": html_content,
+    }
+    request = Request(
+        BREVO_EMAIL_URL,
+        data=json.dumps(payload, ensure_ascii=False).encode("utf-8"),
+        headers={
+            "api-key": api_key,
+            "Content-Type": "application/json",
+            "Accept": "application/json",
+        },
+        method="POST",
     )
 
     try:
-        sg = SendGridAPIClient(sendgrid_api_key)
-        response = sg.send(message)
+        with urlopen(request, timeout=EMAIL_TIMEOUT_SECONDS) as response:
+            status = response.status
+            body = response.read()
+    except HTTPError as error:
+        status = error.code
+        error.close()
+        # Do not log the API key, request payload, recipient, or reset links.
+        logger.error("Brevo email request rejected: status=%s", status)
+        reason = {
+            400: "Check the email fields and verified sender in Brevo.",
+            401: "Brevo rejected BREVO_API_KEY. Check that the key is active.",
+            402: "Check the Brevo account's sending allowance and status.",
+            403: "Check Brevo's Transactional email permission, sender, and sending activation.",
+            429: "Brevo's sending rate limit was reached. Try again later.",
+        }.get(status, "Brevo could not accept the email request.")
+        raise EmailDeliveryError(f"{reason} (HTTP {status}).") from None
+    except (URLError, TimeoutError) as error:
+        logger.error("Brevo email request interrupted: type=%s", type(error).__name__)
+        raise EmailDeliveryError(
+            "Could not confirm Brevo accepted the email. Check its transactional logs before retrying."
+        ) from None
 
-        print("SendGrid email sent")
-        print("Status code:", response.status_code)
+    if status != 201:
+        logger.error("Brevo email request returned an unexpected status: status=%s", status)
+        raise EmailDeliveryError(f"Brevo returned an unexpected response (HTTP {status}).")
+    try:
+        result = json.loads(body)
+    except (json.JSONDecodeError, UnicodeDecodeError):
+        logger.error("Brevo email response could not be read.")
+        raise EmailDeliveryError("Brevo's email acceptance could not be verified.") from None
+    if not isinstance(result, dict) or not isinstance(result.get("messageId"), str) or not result["messageId"]:
+        logger.error("Brevo email response did not include a message ID.")
+        raise EmailDeliveryError("Brevo's email response did not include a message ID.")
 
-        return response
-
-    except Exception as error:
-        print("SendGrid email failed:", error)
-        raise error
+    logger.info("Brevo accepted email: message_id=%s", result["messageId"])
+    return result
 
 
 def send_booking_confirmation_email(
@@ -47,6 +101,7 @@ def send_booking_confirmation_email(
     total_price: int,
     booking_id: int
 ):
+    guest_name = escape(guest_name)
     html = f"""
     <html>
         <body>
@@ -89,6 +144,7 @@ def send_cancellation_confirmation_email(
     total_price: int,
     booking_id: int
 ):
+    guest_name = escape(guest_name)
     html = f"""
     <html>
         <body>
@@ -126,6 +182,8 @@ def send_password_reset_email(
     guest_name: str,
     reset_link: str,
 ):
+    guest_name = escape(guest_name)
+    reset_link = escape(reset_link, quote=True)
     html = f"""
     <html>
         <body>
